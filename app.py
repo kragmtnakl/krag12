@@ -1,6 +1,6 @@
 from flask import Flask, request, jsonify
 from datetime import datetime, timedelta
-import time
+import os
 
 app = Flask(__name__)
 ip_log = {}
@@ -20,12 +20,10 @@ def track():
     action = data.get('action', 'unknown')
     now = datetime.now()
 
-    # حذف IPات المحظورة بعد مرور ساعة
     for ip_banned in list(blocked_ips.keys()):
         if now > blocked_ips[ip_banned]:
             del blocked_ips[ip_banned]
 
-    # حظر المدينة مؤقتًا عند التكرار
     if city in city_block_log and city_block_log[city] > now:
         return jsonify({'status': 'blocked_city', 'message': 'تم حظر المدينة مؤقتًا'}), 403
 
@@ -37,7 +35,6 @@ def track():
 
     ip_log[ip].append(now)
 
-    # فلترة النقرات في آخر دقيقتين
     recent = [t for t in ip_log[ip] if now - t < timedelta(minutes=2)]
     ip_log[ip] = recent
 
@@ -45,7 +42,6 @@ def track():
         blocked_ips[ip] = now + timedelta(minutes=4)
         return jsonify({'status': 'paused', 'message': 'تم إيقاف الإعلان مؤقتًا'}), 403
 
-    # حظر المدينة عند تكرار نقرات كثيرة
     city_clicks = [t for t in ip_log[ip] if now - t < timedelta(minutes=2)]
     if len(city_clicks) >= 5:
         city_block_log[city] = now + timedelta(minutes=30)
@@ -60,4 +56,5 @@ def track():
     })
 
 if __name__ == '__main__':
-    app.run(debug=True)
+    port = int(os.environ.get("PORT", 5000))
+    app.run(host='0.0.0.0', port=port)
