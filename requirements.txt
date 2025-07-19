@@ -1,1 +1,36 @@
-flask
+from flask import Flask, request, redirect
+from datetime import datetime
+
+app = Flask(__name__)
+
+# قائمة لتخزين بيانات النقرات (يمكن استبدالها بقاعدة بيانات لاحقًا)
+clicks_data = []
+
+@app.route("/click")
+def track_click():
+    ip = request.remote_addr
+    user_agent = request.headers.get("User-Agent", "Unknown")
+    time = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+    
+    # تخزين البيانات
+    clicks_data.append({
+        "ip": ip,
+        "user_agent": user_agent,
+        "time": time
+    })
+    
+    print(f"New click: IP={ip}, UA={user_agent}, Time={time}")
+    
+    # إعادة توجيه للصفحة الأصلية
+    return redirect("https://your-real-site.com")
+
+@app.route("/stats")
+def show_stats():
+    html = "<h2>بيانات النقرات المسجلة:</h2><table border='1'><tr><th>IP</th><th>User Agent</th><th>الوقت</th></tr>"
+    for click in clicks_data:
+        html += f"<tr><td>{click['ip']}</td><td>{click['user_agent']}</td><td>{click['time']}</td></tr>"
+    html += "</table>"
+    return html
+
+if __name__ == "__main__":
+    app.run(host="0.0.0.0", port=5000)
