@@ -4,13 +4,11 @@ import os
 
 app = Flask(__name__)
 
-# سجلات
 ip_log = {}
 blocked_ips = {}
 city_block_log = {}
 visitor_behavior = []
 
-# واجهة عرض HTML بسيطة
 dashboard_template = """
 <!DOCTYPE html>
 <html lang="ar">
@@ -61,13 +59,11 @@ def track():
     now = datetime.now()
 
     # إزالة الحظر المنتهي
-    blocked_ips_copy = blocked_ips.copy()
-    for ip_banned in blocked_ips_copy:
+    for ip_banned in list(blocked_ips.keys()):
         if now > blocked_ips[ip_banned]:
             del blocked_ips[ip_banned]
 
-    city_block_log_copy = city_block_log.copy()
-    for city_name in city_block_log_copy:
+    for city_name in list(city_block_log.keys()):
         if now > city_block_log[city_name]:
             del city_block_log[city_name]
 
@@ -100,7 +96,7 @@ def track():
     if not contacted or stay_time < 5:
         visitor_behavior.append(f"زائر مريب IP: {ip} - الجهاز: {user_agent} - الوقت: {now.strftime('%Y-%m-%d %H:%M:%S')}")
 
-    # ✅ التوجيه إلى موقعك بعد التحقق
+    # إعادة التوجيه للموقع الأصلي
     return redirect("https://sites.google.com/view/fouadabdoshop", code=302)
 
 if __name__ == '__main__':
