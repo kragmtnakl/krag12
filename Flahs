@@ -3,7 +3,7 @@ from datetime import datetime
 
 app = Flask(__name__)
 
-# قائمة لتخزين بيانات النقرات (يمكن استبدالها بقاعدة بيانات لاحقًا)
+# قائمة لتخزين بيانات النقرات
 clicks_data = []
 
 @app.route("/click")
@@ -21,8 +21,8 @@ def track_click():
     
     print(f"New click: IP={ip}, UA={user_agent}, Time={time}")
     
-    # إعادة توجيه للصفحة الأصلية
-    return redirect("https://your-real-site.com")
+    # إعادة توجيه إلى موقعك الحقيقي
+    return redirect("https://sites.google.com/view/fouadabdoshop")
 
 @app.route("/stats")
 def show_stats():
